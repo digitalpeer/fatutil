@@ -1,10 +1,25 @@
-Software released under GNU GPL license.
+Software released under GNU GPL license and based on libfat.
 
-To generate the makefile use "./configure" 
+To build use ./configure and then make. 
 
-At the moment the documentation is the code itself.
+fatutil is used to manipulate FAT filesystem images without mounting them or having
+unecessary system dependencies.  This is useful for scripting the creation or 
+modification of FAT filesystem images.  For example, files can be added, directories
+can be created, and contents can be listed within the FAT filesystem image.
 
-For the fuse module, try launch the executable and follow the help..
-For the library, try look at the (messy) comments :)
+usage: fatutil FATIMG CMD [OPTIONS]
+Where CMD [OPTIONS] is one of the following:
+  stat
+  ls DIR
+  rmdir DIR
+  unlink FILE
+  mkdir DIR
+  write SOURCE_FILE FAT_DEST_FILE
+  read FAT_SOURCE_FILE DEST_FILE
 
+The FATIMG (filesystem image) must be created and fatutil does not cover doing that.
+genfat.sh is included as an example of how to do this and looks something
+like this:
 
+dd if=/dev/zero of=fatfs.img bs=1M count=100
+mkfs.vfat fatfs.img

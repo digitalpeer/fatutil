@@ -2,36 +2,18 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.60)
-AC_INIT([fuse-umfuse-fat], [0.1], [osd@cs.unibo.it])
+AC_INIT([fatutil], [0.1], [joshua.henderson@linux.com])
 AM_INIT_AUTOMAKE([foreign dist-bzip2 1.10])
-AC_CONFIG_SRCDIR([fusefat.c])
+AC_CONFIG_SRCDIR([fatutil.c])
 AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
-# Checks for libraries.
-PKG_CHECK_MODULES(FUSE, fuse)
-AC_SUBST(FUSE_LIBS)
-AC_SUBST(FUSE_CFLAGS)
-
 PKG_CHECK_MODULES(GLIB2, glib-2.0)
 AC_SUBST(GLIB2_LIBS)
 AC_SUBST(GLIB2_CFLAGS)
-
-#AC_CHECK_LIB([umlib], [um_add_service], [UMLIB_LIBS=""],
-#   [AC_MSG_ERROR([Can't find libumlib, please install it])])
-
-AC_MSG_CHECKING([if FUSE on this system is too new for us])
-AC_EGREP_CPP([yes], [
-#include "fuse.h"
-#if FUSE_VERSION > 26
-yes
-#endif
-], AC_DEFINE([FUSE_USE_VERSION], [26], [Version of FUSE interface]) AC_MSG_RESULT([yes]),
-   AC_DEFINE([FUSE_USE_VERSION], [FUSE_VERSION], [Version of FUSE interface]) AC_MSG_RESULT([no]))
-
 
 # Checks for header files.
 AC_HEADER_DIRENT

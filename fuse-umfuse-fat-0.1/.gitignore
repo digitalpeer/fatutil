@@ -1,0 +1,14 @@
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache/
+/libtool
+/config.*
+/configure
+/m4/
+/stamp-h?
+.deps/
+.dirstamp
+*.o
+*~
+fatutil
