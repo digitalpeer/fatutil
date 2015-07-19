@@ -1,11 +1,17 @@
 Software released under GNU GPL license and based on libfat.
 
-To build use ./configure and then make. 
+fatutil is used to manipulate FAT filesystem images without mounting them or
+having unecessary system dependencies (privileged access).  This is useful
+for scripting the creation or modification of FAT filesystem images.  For
+example, files can be added, directories can be created, and contents can be
+listed within the FAT filesystem image without ever mounting it.
 
-fatutil is used to manipulate FAT filesystem images without mounting them or having
-unecessary system dependencies.  This is useful for scripting the creation or 
-modification of FAT filesystem images.  For example, files can be added, directories
-can be created, and contents can be listed within the FAT filesystem image.
+To build use:
+autoreconf --install
+./configure
+make
+
+Run fatutil with no options to get the help:
 
 usage: fatutil FATIMG CMD [OPTIONS]
 Where CMD [OPTIONS] is one of the following:
@@ -17,9 +23,9 @@ Where CMD [OPTIONS] is one of the following:
   write SOURCE_FILE FAT_DEST_FILE
   read FAT_SOURCE_FILE DEST_FILE
 
-The FATIMG (filesystem image) must be created and fatutil does not cover doing that.
-genfat.sh is included as an example of how to do this and looks something
-like this:
+The FATIMG (filesystem image) must be created and fatutil does not cover
+doing that. genfat.sh is included as an example of how to do this and looks
+something like this:
 
 dd if=/dev/zero of=fatfs.img bs=1M count=100
 mkfs.vfat fatfs.img
