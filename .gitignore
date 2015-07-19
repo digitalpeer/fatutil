@@ -6,7 +6,11 @@
 /config.*
 /configure
 /m4/
+/install-sh
 /stamp-h?
+/ltmain.sh
+/missing
+/depcomp
 .deps/
 .dirstamp
 *.o
