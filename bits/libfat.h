@@ -17,7 +17,6 @@
 #endif
 
 #include <config.h>
-#include <glib.h>
 
 /*	Maximum number of file opened	*/
 #define MAX_OPENED_FILES	4096
@@ -424,7 +423,7 @@ int find_sfn_length( DirEntry_t *D, int bufsize);
 int extract_sfn_name(DirEntry_t *D, int bufsize, char *name);
 int fatentry_to_dirent(Volume_t *V, DirEnt_t *D, struct dirent *dirp);
 int find_direntry(Volume_t *V, char *name, DWORD *Cluster, DWORD *Offset);
-int traverse_path(Volume_t *V, gchar **parts, guint parts_len, DWORD *Cluster);
+int traverse_path(Volume_t *V, char **parts, uint parts_len, DWORD *Cluster);
 int find_file(Volume_t *V, const char *path, File_t *F, DWORD *Cluster, DWORD *Offset);
 int fat_fat_sync(Volume_t *V);
 #endif /* #ifdef _BITS_LIBFAT_H */

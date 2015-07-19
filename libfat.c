@@ -43,12 +43,19 @@
 #include <string.h>
 #include <linux/unistd.h>
 #include <errno.h>
-#include <glib.h>
 #include <pthread.h>
 #include <execinfo.h>
 #include <stdarg.h>
 #include <dlfcn.h>
 #include <errno.h>
+
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
 
 #ifndef POPULATE_FREELIST_BUFSZ
 #define POPULATE_FREELIST_BUFSZ 8192
@@ -1627,7 +1634,7 @@ int find_direntry(Volume_t *V, char *name, DWORD *Cluster, DWORD *Offset) {
 /*	Offset probably not needed								*/
 
 
-int traverse_path(Volume_t *V, gchar **parts, guint parts_len, DWORD *Cluster) {
+int traverse_path(Volume_t *V, char **parts, uint parts_len, DWORD *Cluster) {
     DWORD Offset = 0;
     DWORD Clus;
 //    char nextdir[255];
@@ -1664,7 +1671,42 @@ int traverse_path(Volume_t *V, gchar **parts, guint parts_len, DWORD *Cluster) {
 	return 0;
 }
 
+static char** split_path_parts(const char* path, char del) {
+	char **res = NULL;
+	int num = 0;
+	char *next;
+	const char *curr = path;
+  
+	while ((next = strchr(curr, del)) != NULL) {
+		res = realloc (res, sizeof (char*) * ++num);
+		res[num-1] = strndup(curr, next - curr);
+		curr = next + 1;
+	}
+	if (strlen(curr)) {
+		res = realloc (res, sizeof (char*) * ++num);
+		res[num-1] = strdup(curr);
+	}
+	res = realloc (res, sizeof (char*) * ++num);
+	res[num-1] = NULL;
+  
+	return res;
+}
 
+static void free_split_path_parts(char** parts) {
+	char **p = parts;
+	while (p && *p) {
+		free(*p++);
+	}
+	free(parts);
+}
+
+static uint count_path_parts(char** parts) {
+	uint count = 0;
+	char** p = parts;
+	while (p && *p++)
+		count++;
+	return count;
+}
 
 /* find the file (direntry) related to the given path. N.B. The path must exist exactly in the volume V.*/
 /* it sets adequately Cluster and Offset. the caller has to fetch the direntry of the file of interest	*/
@@ -1673,8 +1715,8 @@ int find_file(Volume_t *V, const char *path, File_t *F, DWORD *Cluster, DWORD *O
     int res;
 
     /*	splitting the path	*/
-    gchar **parts = g_strsplit(path, "/", -1);
-    guint parts_len = g_strv_length(parts);
+    char **parts = split_path_parts(path, '/');
+    uint parts_len = count_path_parts(parts);
 	
     filename=(char *) parts[parts_len - 1];
 
@@ -1687,7 +1729,7 @@ int find_file(Volume_t *V, const char *path, File_t *F, DWORD *Cluster, DWORD *O
     /*	exists, we put DIR=that dir. If not throws an exception						*/
 
 	if ( (res=traverse_path(V, parts, parts_len, Cluster)) != 0) { 
-		g_strfreev(parts);
+		free_split_path_parts(parts);
 		return -1; 
 	}	//error 
 
@@ -1698,7 +1740,7 @@ int find_file(Volume_t *V, const char *path, File_t *F, DWORD *Cluster, DWORD *O
 	*Offset = 0;
 
 	res = find_direntry(V, filename , Cluster, Offset); //looking for the directory
-	g_strfreev(parts);
+	free_split_path_parts(parts);
 	
 	if  (res != 0 ) { 
 		return -1;  //error: part of the path not found.
@@ -3112,25 +3154,6 @@ int utf8to16( const char *restrict source, WORD *restrict dest) {
     *dest = 0;
     return 0;
 }
-
-#if 0
-/*	Convert the utf16le filename to ASCII 8+3 numeric tailed filename	*/
-/*	return 0 on success, -1 on error									*/
-/*  Used to create direntries.							  				*/
-int utf8toSfn(WORD *restrict source, char *restrict dest, int len, int val) {
-    char *ext;
-
-	/*	splitting the filename	*/
-    gchar **parts = g_strsplit(path, ".", -1);
-    guint parts_len = g_strv_length(parts);
-	
-	if (parts_len > 1) {
-    	ext=(char *) parts[parts_len - 1];
-	} else {	//no extension
-		ext = NULL;
-	}
-}
-#endif
 
 /*	Convert the utf16le string source to ASCII string dest. Used for printing	*/
 /*	return the string length including the null terminator				*/
